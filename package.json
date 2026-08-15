@@ -1,0 +1,13 @@
+{
+  "name": "scryland-mr",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Scryland Mono Repo : Personal Card Stock Fetcher.",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev:api": "pnpm --filter @scryland/api start:dev"
+  }
+}
