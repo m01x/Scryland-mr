@@ -133,9 +133,12 @@ Si un worker reporta que necesita cambiar el contrato de `shared/`, el orquestad
 - **Consistencia**: estructura en disco, documentación en Notion e instrucciones de agentes deben coincidir. Cualquier divergencia se reporta antes de seguir.
 - **Archivos raíz**: `.env.example` y `.env` de la raíz son territorio exclusivo del orquestador. Los workers reportan variables nuevas, no las escriben. No existen `.env.example` por worker: la fuente única es el de la raíz.
 - **Límites de los bloques de tarea**: ningún bloque de tarea de un worker puede contener pasos fuera de su carpeta escribible. Si un paso requiere tocar la raíz, sube al bloque del orquestador.
-- **Instalación serializada**: los `pnpm install` se serializan entre workers — hay un solo `pnpm-lock.yaml` compartido.
+- **Fase de instalación serial**: Ningún despacho en paralelo puede incluir operaciones que escriban recursos compartidos de la raíz — `pnpm-lock.yaml`, el store de `node_modules`, el `package.json` de la raíz. Las instalaciones de dependencias de todos los workers se ejecutan en serie, una tras otra, antes de soltar el trabajo en paralelo. El trabajo que solo toca archivos dentro de la carpeta de cada worker sí corre en paralelo. Ante la duda de si una operación toca un recurso compartido, el orquestador la serializa: el costo de serializar de más es tiempo; el de paralelizar de más es corrupción. `app/api/package.json` y `app/web/package.json` son de cada worker y NO son recurso compartido — dos agentes editando cada uno el suyo no chocan; lo que choca es el `pnpm-lock.yaml` que ambos `pnpm install` escriben. No redactes la regla como "no tocar package.json en paralelo", porque prohibiría algo que sí es seguro.
 - **Scripts raíz en criterios**: todo criterio de aceptación global que dependa de un script de la raíz exige que ese script exista o sea creado dentro de la misma spec.
 - **TSConfig de shared**: `declaration: true` (con `emitDeclarationOnly: true`) vive en `shared/tsconfig.json`, no en los tsconfig de los workers.
+- **Consumo de `shared/`**: `@scryland/shared` compila solo a `.d.ts` (no hay runtime export). Los workers lo consumen con `import type`, nunca como import de valor.
+- **Orden de build**: `build:shared` corre antes del build del backend. El script raíz `build` encadena `build:shared` → build `app/api` → build `app/web`.
+- **`APP_VERSION`**: variable de entorno requerida por el backend, leída por el health desde `ConfigService`. Vive en el `.env` de la raíz (junto a `PORT`/`WEB_PORT`), nunca se lee del `package.json` en runtime.
 El flujo de specs de este repo es el descrito en este documento. Ninguna skill externa lo reemplaza ni lo reinterpreta.
 ## Estado actual
  

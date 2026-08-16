@@ -10,7 +10,9 @@
   "scripts": {
     "dev:api": "pnpm --filter @scryland/api start:dev",
     "dev:web": "pnpm --filter @scryland/web dev",
-    "dev": "concurrently -k -n api,web \"pnpm dev:api\" \"wait-on http://localhost:3000 && pnpm dev:web\""
+    "dev": "concurrently -k -n api,web \"pnpm dev:api\" \"wait-on http://localhost:3000 && pnpm dev:web\"",
+    "build:shared": "pnpm --filter @scryland/shared build",
+    "build": "pnpm build:shared && pnpm --filter @scryland/api build && pnpm --filter @scryland/web build"
   },
   "devDependencies": {
     "concurrently": "^10.0.5",

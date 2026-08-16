@@ -1,6 +1,6 @@
 # Spec 03 - Carpintería de frontend y base de API
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-08-16
 **Tipo:** Orquestador
 
@@ -39,11 +39,11 @@
 
 Los cinco puntos siguientes son territorio del orquestador y deben estar **todos** completos antes del despacho. Ninguno es opcional ni diferible: el backend no arranca sin `APP_VERSION` en el `.env`, y el frontend no puede construir el target del proxy sin `PORT` en ese mismo archivo.
 
-- [ ] 1.1 Crear `shared/` (paquete `@scryland/shared` + contrato `HealthResponse`/`ApiError` + build de `.d.ts`).
-- [ ] 1.2 Agregar el script raíz `build:shared`.
-- [ ] 1.3 Agregar el script raíz `build` (encadena `build:shared` → build `app/api` → build `app/web`).
-- [ ] 1.4 Agregar `APP_VERSION` a `.env.example` y crear el `.env` de la raíz (`cp .env.example .env`).
-- [ ] 1.5 Actualizar `AGENTS.md` raíz con las reglas estructurales nuevas.
+- [x] 1.1 Crear `shared/` (paquete `@scryland/shared` + contrato `HealthResponse`/`ApiError` + build de `.d.ts`).
+- [x] 1.2 Agregar el script raíz `build:shared`.
+- [x] 1.3 Agregar el script raíz `build` (encadena `build:shared` → build `app/api` → build `app/web`).
+- [x] 1.4 Agregar `APP_VERSION` a `.env.example` y crear el `.env` de la raíz (`cp .env.example .env`).
+- [x] 1.5 Actualizar `AGENTS.md` raíz con las reglas estructurales nuevas.
 
 **Compuerta de despacho:** si cualquiera de los cinco está incompleto, el despacho del paso 2 no ocurre. El orquestador verifica y reporta los cinco antes de continuar.
 
@@ -67,16 +67,16 @@ Orquestador consolida, verifica la integración (proxy → `/api/health` → use
 ### Paso 4 — Revisión humana
 
 ## Criterios de aceptación globales
-- [ ] Los cinco puntos del paso 1 están completos y verificados **antes** del despacho de los workers.
-- [ ] El `pnpm-lock.yaml` quedó íntegro: un solo lockfile, `pnpm install` final limpio, sin conflictos de escritura concurrente.
-- [ ] `shared/` exporta `HealthResponse` y `ApiError`, y ambos workers compilan contra él sin duplicar tipos.
-- [ ] `pnpm build` en `app/api` produce `dist/main.js` en la raíz de `dist/` (no `dist/app/api/src/main.js`).
-- [ ] `GET /api/health` responde 200 con `{ status, uptime, version }` (versión desde `APP_VERSION`).
-- [ ] La app de Nest no arranca si falta una variable de env requerida.
-- [ ] El frontend levanta con Tailwind + shadcn + TanStack (Query + Router) con devtools, y muestra el resultado del health vía `useQuery`.
-- [ ] `pnpm install`, `build` y `dev` corren limpios desde la raíz.
-- [ ] `app/api` y `app/web` no se tocaron entre sí.
-- [ ] Humano revisa y da visto bueno.
+- [x] Los cinco puntos del paso 1 están completos y verificados **antes** del despacho de los workers.
+- [x] El `pnpm-lock.yaml` quedó íntegro: un solo lockfile, `pnpm install` final limpio, sin conflictos de escritura concurrente.
+- [x] `shared/` exporta `HealthResponse` y `ApiError`, y ambos workers compilan contra él sin duplicar tipos.
+- [x] `pnpm build` en `app/api` produce `dist/main.js` en la raíz de `dist/` (no `dist/app/api/src/main.js`).
+- [x] `GET /api/health` responde 200 con `{ status, uptime, version }` (versión desde `APP_VERSION`).
+- [x] La app de Nest no arranca si falta una variable de env requerida.
+- [x] El frontend levanta con Tailwind + shadcn + TanStack (Query + Router) con devtools, y muestra el resultado del health vía `useQuery`.
+- [x] `pnpm install`, `build` y `dev` corren limpios desde la raíz.
+- [x] `app/api` y `app/web` no se tocaron entre sí.
+- [x] Humano revisa y da visto bueno.
 
 ## Decisiones
 - `shared/` se crea ahora: el health y la forma de error son el primer contrato real; evita divergencias desde el día uno.
@@ -99,11 +99,20 @@ Orquestador consolida, verifica la integración (proxy → `/api/health` → use
 - **Orden crítico** alias `@/*` → `shadcn init` (ya advertido en el bloque frontend).
 - **Primer spec orquestador**: riesgo de proceso (paralelización, límites de escritura). Mitigado por permisos ya definidos en `opencode.json`.
 
+## Notas fuera de alcance (para spec de limpieza posterior)
+
+Surgidas de la revisión humana. No se corrigen aquí; van a una spec de limpieza posterior:
+
+1. **shadcn CLI en `dependencies`**: shadcn v4 agregó el CLI `shadcn` como dependency (debería ir en `devDependencies`) y dejó `@radix-ui/react-slot` redundante (usa el paquete consolidado `radix-ui`).
+2. **`src/routeTree.gen.ts` debe commitearse**: no está en `.gitignore` y `tsc -b` lo necesita para pasar en un clone limpio.
+3. **Ruido de `HEAD /` → 404 en cada `pnpm dev`**: `wait-on` hace polling a `http://localhost:3000` (la raíz), que ya no tiene ruta desde que existe el prefijo `/api`. Cada ping devuelve 404 legítimo y el `AllExceptionsFilter` lo loguea con stack trace completo. Fix propuesto: apuntar `wait-on` a `http://localhost:3000/api/health` (espera a que la API esté sana, no solo a que el puerto abra).
+4. **`AllExceptionsFilter` loguea stack trace para 4xx**: un 404 es operación normal, no un fallo de programa. Fix propuesto: stack trace solo para 5xx; los 4xx se loguean en una línea sin stack.
+
 ---
 
 # Tarea — @Agente-Backend
 
-**Estado:** Borrador
+**Estado:** Implementado
 
 ### Contexto
 Hoy `main.ts` lee `process.env.PORT ?? 3000` crudo y expone el "Hello World!" en `/`. No hay prefijo, CORS, validación ni manejo de errores estándar. Este bloque monta la base sobre la que el frontend (y Spec 04) se apoyan.
@@ -133,13 +142,13 @@ Hoy `main.ts` lee `process.env.PORT ?? 3000` crudo y expone el "Hello World!" en
 9. Reportar.
 
 ### Criterios de aceptación
-- [ ] `pnpm dev:api` desde la raíz arranca leyendo el `.env` de la raíz; si `PORT` o `APP_VERSION` faltan o son inválidos, la app no arranca.
-- [ ] `GET /api/health` → 200 `{ status, uptime, version }` con `version` = `APP_VERSION`.
-- [ ] `GET /api` (hello) responde 200 bajo el prefijo.
-- [ ] CORS habilitado (verificable vía request cross-origin / headers OPTIONS).
-- [ ] Un error dispara la forma `ApiError` estándar.
-- [ ] `pnpm build` produce `dist/main.js` en la raíz de `dist/`, no anidado.
-- [ ] Compila contra `@scryland/shared` sin tipos duplicados.
+- [x] `pnpm dev:api` desde la raíz arranca leyendo el `.env` de la raíz; si `PORT` o `APP_VERSION` faltan o son inválidos, la app no arranca.
+- [x] `GET /api/health` → 200 `{ status, uptime, version }` con `version` = `APP_VERSION`.
+- [x] `GET /api` (hello) responde 200 bajo el prefijo.
+- [x] CORS habilitado (verificable vía request cross-origin / headers OPTIONS).
+- [x] Un error dispara la forma `ApiError` estándar.
+- [x] `pnpm build` produce `dist/main.js` en la raíz de `dist/`, no anidado.
+- [x] Compila contra `@scryland/shared` sin tipos duplicados.
 
 ### Notas / restricciones
 - `shared/` y `.spec/` son solo lectura: si `HealthResponse`/`ApiError` no cubren algo, reportar al orquestador, no editar.
@@ -150,7 +159,7 @@ Hoy `main.ts` lee `process.env.PORT ?? 3000` crudo y expone el "Hello World!" en
 
 # Tarea — @Agente-Frontend
 
-**Estado:** Borrador
+**Estado:** Implementado
 
 ### Contexto
 Hoy `app/web` es el scaffold Vite + React pelado (`App.tsx` de demo). Faltan Tailwind, shadcn, TanStack Query + Router y el alias `@/*`. Este bloque deja las herramientas listas y las prueba con un smoke test contra `/api/health`.
@@ -183,13 +192,13 @@ Hoy `app/web` es el scaffold Vite + React pelado (`App.tsx` de demo). Faltan Tai
 10. Reportar.
 
 ### Criterios de aceptación
-- [ ] Tailwind aplica (clases utilitarias funcionan); CSS demo eliminado.
-- [ ] `shadcn init` corrió, `button` instalado y `@/*` resuelve (el `Button` importa bien y se usa en la ruta raíz).
-- [ ] TanStack Query + devtools montados; `useQuery` a `/api/health` resuelve y muestra `status`.
-- [ ] TanStack Router file-based sirve la ruta raíz; router-devtools visible.
-- [ ] Proxy `/api` funciona usando `PORT` del `.env` raíz (no `localhost:3000` hardcodeado).
-- [ ] `pnpm build` y `oxlint` pasan.
-- [ ] Compila contra `@scryland/shared` sin tipos duplicados.
+- [x] Tailwind aplica (clases utilitarias funcionan); CSS demo eliminado.
+- [x] `shadcn init` corrió, `button` instalado y `@/*` resuelve (el `Button` importa bien y se usa en la ruta raíz).
+- [x] TanStack Query + devtools montados; `useQuery` a `/api/health` resuelve y muestra `status`.
+- [x] TanStack Router file-based sirve la ruta raíz; router-devtools visible.
+- [x] Proxy `/api` funciona usando `PORT` del `.env` raíz (no `localhost:3000` hardcodeado).
+- [x] `pnpm build` y `oxlint` pasan.
+- [x] Compila contra `@scryland/shared` sin tipos duplicados.
 
 ### Notas / restricciones
 - `shared/`, `.spec/` y `app/api/` son solo lectura.
