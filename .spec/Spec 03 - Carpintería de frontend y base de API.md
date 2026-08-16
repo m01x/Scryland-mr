@@ -1,6 +1,6 @@
 # Spec 03 - Carpintería de frontend y base de API
 
-**Estado:** Borrador
+**Estado:** Aprobado
 **Fecha:** 2026-08-16
 **Tipo:** Orquestador
 
@@ -34,12 +34,41 @@
 - CI/CD, deploy.
 
 ## Plan de implementación
-1. Orquestador (antes del despacho): crea `shared/` (paquete + contrato + build de `.d.ts`), agrega los scripts raíz `build:shared` y `build` (encadena build:shared → build app/api → build app/web), agrega `APP_VERSION` a `.env.example`, crea el `.env` de la raíz (`cp .env.example .env`), y actualiza `AGENTS.md` raíz con las reglas estructurales nuevas. El despacho en paralelo no ocurre hasta que estos puntos estén hechos.
-2. Despacho en paralelo de los bloques `@Agente-Backend` y `@Agente-Frontend` (cada uno declara `@scryland/shared` en su `package.json`).
-3. Orquestador consolida, verifica la integración (proxy → `/api/health` → useQuery) y actualiza `.spec/State.md`.
-4. Revisión humana.
+
+### Paso 1 — Preparación de la raíz (orquestador, serial)
+
+Los cinco puntos siguientes son territorio del orquestador y deben estar **todos** completos antes del despacho. Ninguno es opcional ni diferible: el backend no arranca sin `APP_VERSION` en el `.env`, y el frontend no puede construir el target del proxy sin `PORT` en ese mismo archivo.
+
+- [ ] 1.1 Crear `shared/` (paquete `@scryland/shared` + contrato `HealthResponse`/`ApiError` + build de `.d.ts`).
+- [ ] 1.2 Agregar el script raíz `build:shared`.
+- [ ] 1.3 Agregar el script raíz `build` (encadena `build:shared` → build `app/api` → build `app/web`).
+- [ ] 1.4 Agregar `APP_VERSION` a `.env.example` y crear el `.env` de la raíz (`cp .env.example .env`).
+- [ ] 1.5 Actualizar `AGENTS.md` raíz con las reglas estructurales nuevas.
+
+**Compuerta de despacho:** si cualquiera de los cinco está incompleto, el despacho del paso 2 no ocurre. El orquestador verifica y reporta los cinco antes de continuar.
+
+### Paso 2 — Despacho en paralelo
+
+Despacho de los bloques `@Agente-Backend` y `@Agente-Frontend` (cada uno declara `@scryland/shared` en su `package.json`).
+
+**Instalación serializada.** Existe un único `pnpm-lock.yaml` en la raíz; dos `pnpm install` concurrentes lo corrompen. El orquestador serializa así:
+
+1. Despacha al primer worker y espera a que termine **su** `pnpm install`.
+2. Recién entonces despacha el `pnpm install` del segundo worker.
+3. El resto del trabajo de ambos bloques (código, configuración, verificación) sí corre en paralelo.
+4. Al consolidar, el orquestador corre un `pnpm install` final desde la raíz para asentar el lockfile.
+
+Si el runtime de agentes no permite esa granularidad, la alternativa es que el orquestador ejecute **ambos** `pnpm install` él mismo, antes de despachar, con las dependencias declaradas en la spec.
+
+### Paso 3 — Consolidación
+
+Orquestador consolida, verifica la integración (proxy → `/api/health` → useQuery), corre el `pnpm install` final y actualiza `.spec/State.md`.
+
+### Paso 4 — Revisión humana
 
 ## Criterios de aceptación globales
+- [ ] Los cinco puntos del paso 1 están completos y verificados **antes** del despacho de los workers.
+- [ ] El `pnpm-lock.yaml` quedó íntegro: un solo lockfile, `pnpm install` final limpio, sin conflictos de escritura concurrente.
 - [ ] `shared/` exporta `HealthResponse` y `ApiError`, y ambos workers compilan contra él sin duplicar tipos.
 - [ ] `pnpm build` en `app/api` produce `dist/main.js` en la raíz de `dist/` (no `dist/app/api/src/main.js`).
 - [ ] `GET /api/health` responde 200 con `{ status, uptime, version }` (versión desde `APP_VERSION`).
@@ -59,12 +88,15 @@
 - Proxy de Vite + CORS: el query client usa URLs relativas (`/api/...`); el target del proxy se construye con `loadEnv` leyendo `PORT` del `.env` raíz, para no hardcodear `localhost:3000` mientras el backend tenga `PORT` configurable.
 - TanStack Router file-based con `@tanstack/router-plugin` (codegen de rutas), estructura en `src/routes/`.
 - Tailwind v4 vía `@tailwindcss/vite` (sin `tailwind.config.js` por defecto).
+- **Paso 1 serial, compuerta explícita**: la preparación de la raíz no se paraleliza con los workers. Los cinco puntos son precondición dura del despacho.
+- **Instalación serializada entre workers**: un solo `pnpm-lock.yaml` no tolera escrituras concurrentes; los `pnpm install` van uno después del otro aunque el resto del trabajo sea paralelo.
 
 ## Riesgos
+- **Despacho prematuro**: si el orquestador paraleliza antes de completar el paso 1, ambos bloques mueren en su primer comando (backend sin `APP_VERSION`, frontend sin `PORT` para el proxy). Mitigado por la compuerta explícita del paso 1 y su criterio de aceptación.
+- **Lockfile compartido**: dos `pnpm install` concurrentes sobre el único `pnpm-lock.yaml` lo corrompen. Mitigado por la serialización descrita en el paso 2, el `pnpm install` final del orquestador y su criterio de aceptación.
 - **Integridad de `dist`/rootDir**: consumir `@scryland/shared` mal resuelto rompe `dist/`. Mitigado con el build de `.d.ts` y el criterio de `dist/main.js` en la raíz.
 - **shadcn init vs oxlint**: el init puede asumir ESLint; acá el linter es oxlint. Se ajusta a mano si el init lo asume.
 - **Orden crítico** alias `@/*` → `shadcn init` (ya advertido en el bloque frontend).
-- **Lockfile compartido**: los `pnpm install` de ambos workers tocan el único `pnpm-lock.yaml`; el orquestador corre un `pnpm install` final para asentarlo.
 - **Primer spec orquestador**: riesgo de proceso (paralelización, límites de escritura). Mitigado por permisos ya definidos en `opencode.json`.
 
 ---
@@ -90,7 +122,7 @@ Hoy `main.ts` lee `process.env.PORT ?? 3000` crudo y expone el "Hello World!" en
 - Modificar `app/web` o `shared/`.
 
 ### Plan de implementación
-1. Instalar dependencias y declarar `@scryland/shared` (`workspace:*`).
+1. Instalar dependencias y declarar `@scryland/shared` (`workspace:*`). **Reportar al orquestador al terminar el `pnpm install`, antes de seguir** (el lockfile es compartido y los installs van serializados).
 2. Crear `src/config/env.validation.ts` (schema Joi que exige `PORT` y `APP_VERSION`).
 3. Registrar `ConfigModule.forRoot` global en `app.module.ts` (con `envFilePath` explícito a la raíz).
 4. Crear `src/health/health.controller.ts` (+ service) con `GET /health`.
@@ -112,6 +144,7 @@ Hoy `main.ts` lee `process.env.PORT ?? 3000` crudo y expone el "Hello World!" en
 ### Notas / restricciones
 - `shared/` y `.spec/` son solo lectura: si `HealthResponse`/`ApiError` no cubren algo, reportar al orquestador, no editar.
 - `.env.example` de la raíz es territorio del orquestador; el backend reporta el valor nuevo (`APP_VERSION`) y el orquestador lo aplica.
+- **Lockfile compartido**: no correr `pnpm install` en paralelo con el otro worker. El orquestador coordina el orden; este bloque avisa cuando su install terminó.
 
 ---
 
@@ -138,7 +171,7 @@ Hoy `app/web` es el scaffold Vite + React pelado (`App.tsx` de demo). Faltan Tai
 - Modificar `app/api` o `shared/`.
 
 ### Plan de implementación
-1. Instalar dependencias (Tailwind, shadcn, TanStack) y declarar `@scryland/shared` (`workspace:*`).
+1. Instalar dependencias (Tailwind, shadcn, TanStack) y declarar `@scryland/shared` (`workspace:*`). **Reportar al orquestador al terminar el `pnpm install`, antes de seguir** (el lockfile es compartido y los installs van serializados).
 2. Configurar alias `@/*` en `tsconfig.app.json` y `vite.config.ts`.
 3. Correr `shadcn init` y `pnpm dlx shadcn@latest add button`.
 4. Integrar Tailwind en `index.css` y `main.tsx`; eliminar CSS/demo de Vite.
@@ -164,3 +197,4 @@ Hoy `app/web` es el scaffold Vite + React pelado (`App.tsx` de demo). Faltan Tai
 - Tailwind v4 no usa `tailwind.config.js` por defecto; se configura en CSS (`@import "tailwindcss"`) + `@tailwindcss/vite`.
 - `shadcn init` puede asumir ESLint; acá el linter es oxlint — si lo asume, ajustar/reportar.
 - `loadEnv` debe apuntar su `envDir` a la raíz del monorepo para leer el `.env` raíz, no el de `app/web`.
+- **Lockfile compartido**: no correr `pnpm install` en paralelo con el otro worker. El orquestador coordina el orden; este bloque avisa cuando su install terminó.
