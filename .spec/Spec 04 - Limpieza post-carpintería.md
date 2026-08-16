@@ -1,6 +1,6 @@
 # Spec 04 - Limpieza post-carpintería
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-08-16
 **Tipo:** Orquestador
 
@@ -37,12 +37,12 @@ La Spec 03 dejó cuatro deudas de carpintería documentadas en su sección "Nota
 4. **Revisión humana.**
 
 ## Criterios de aceptación globales
-- [ ] `pnpm dev` arranca sin ruido de 404 en consola (el `wait-on` resuelve contra `/api/health`, que responde 2XX).
-- [ ] Un 404 provocado a mano se loguea en una línea, sin stack.
-- [ ] Un 500 provocado a mano sí muestra stack trace.
-- [ ] `pnpm build` (raíz) y `oxlint` (`pnpm --filter @scryland/web lint`) pasan; `shadcn` aparece bajo `devDependencies` en `app/web/package.json` y en el importer correspondiente del lockfile.
-- [ ] `app/web/src/routeTree.gen.ts` está trackeado en git y no está en ningún `.gitignore`; un clone limpio buildeará sin correr el codegen antes.
-- [ ] Humano revisa y da visto bueno.
+- [x] `pnpm dev` arranca sin ruido de 404 en consola (el `wait-on` resuelve contra `/api/health`, que responde 2XX).
+- [x] Un 404 provocado a mano se loguea en una línea, sin stack.
+- [x] Un 500 provocado a mano sí muestra stack trace.
+- [x] `pnpm build` (raíz) y `oxlint` (`pnpm --filter @scryland/web lint`) pasan; `shadcn` aparece bajo `devDependencies` en `app/web/package.json` y en el importer correspondiente del lockfile.
+- [x] `app/web/src/routeTree.gen.ts` está trackeado en git y no está en ningún `.gitignore`; un clone limpio buildeará sin correr el codegen antes.
+- [x] Humano revisa y da visto bueno.
 
 ## Decisiones
 - **Tipo Orquestador (no Simple):** la clasificación es por territorio, no por tamaño. Cruza `app/web` + `app/api` + raíz, y el orquestador no puede escribir código en `app/api`/`app/web`, por lo que los puntos 1 y 4 exigen workers. El punto 3 y el commit del punto 2 son del orquestador.
@@ -62,7 +62,7 @@ La Spec 03 dejó cuatro deudas de carpintería documentadas en su sección "Nota
 
 # Tarea — @Agente-Frontend
 
-**Estado:** Borrador
+**Estado:** Implementado
 
 ### Contexto
 `app/web/package.json` tiene `shadcn@^4.18.0` en `dependencies` (es un CLI, va en `devDependencies`) y `@radix-ui/react-slot@^1.3.3` redundante: el `Button` de shadcn ya importa `{ Slot }` desde el paquete consolidado `radix-ui` (verificado en `src/components/ui/button.tsx`).
@@ -86,11 +86,11 @@ La Spec 03 dejó cuatro deudas de carpintería documentadas en su sección "Nota
 6. Reportar.
 
 ### Criterios de aceptación
-- [ ] `shadcn` está en `devDependencies`, no en `dependencies`.
-- [ ] `@radix-ui/react-slot` eliminado y `grep -rn "react-slot" src/` solo lo reportaba en `button.tsx`; `Button` sigue compilando (importa `Slot` desde `radix-ui`).
-- [ ] `pnpm --filter @scryland/web build` y `lint` pasan.
-- [ ] `shadcn` aparece bajo `devDependencies` en `app/web/package.json` y su entrada en `pnpm-lock.yaml` está bajo el importer dev de `@scryland/web` (no runtime).
-- [ ] `pnpm-lock.yaml` quedó íntegro (sin conflicto, un solo install).
+- [x] `shadcn` está en `devDependencies`, no en `dependencies`.
+- [x] `@radix-ui/react-slot` eliminado y `grep -rn "react-slot" src/` solo lo reportaba en `button.tsx`; `Button` sigue compilando (importa `Slot` desde `radix-ui`).
+- [x] `pnpm --filter @scryland/web build` y `lint` pasan.
+- [x] `shadcn` aparece bajo `devDependencies` en `app/web/package.json` y su entrada en `pnpm-lock.yaml` está bajo el importer dev de `@scryland/web` (no runtime).
+- [x] `pnpm-lock.yaml` quedó íntegro (sin conflicto, un solo install).
 
 ### Notas / restricciones
 - `shared/`, `.spec/`, `app/api/` y archivos raíz son solo lectura.
@@ -100,7 +100,7 @@ La Spec 03 dejó cuatro deudas de carpintería documentadas en su sección "Nota
 
 # Tarea — @Agente-Backend
 
-**Estado:** Borrador
+**Estado:** Implementado
 
 ### Contexto
 `AllExceptionsFilter.catch` hoy loguea `exception.stack` para **toda** excepción (4xx y 5xx). Un 404 es operación normal; solo los 5xx deben loguear stack.
@@ -119,10 +119,10 @@ La Spec 03 dejó cuatro deudas de carpintería documentadas en su sección "Nota
 3. Reportar.
 
 ### Criterios de aceptación
-- [ ] Un 4xx se loguea en una línea (sin `stack`).
-- [ ] Un 5xx se loguea con `stack`.
-- [ ] `pnpm --filter @scryland/api build` pasa.
-- [ ] No se tocó nada fuera de `app/api`.
+- [x] Un 4xx se loguea en una línea (sin `stack`).
+- [x] Un 5xx se loguea con `stack`.
+- [x] `pnpm --filter @scryland/api build` pasa.
+- [x] No se tocó nada fuera de `app/api`.
 
 ### Notas / restricciones
 - `shared/`, `.spec/`, `app/web/` y archivos raíz son solo lectura.

@@ -51,10 +51,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = 'Internal server error';
     }
 
-    this.logger.error(
-      `${request.method} ${request.url} → ${status}`,
-      exception instanceof Error ? exception.stack : undefined,
-    );
+    if (status >= 500) {
+      this.logger.error(
+        `${request.method} ${request.url} → ${status}`,
+        exception instanceof Error ? exception.stack : undefined,
+      );
+    } else {
+      this.logger.error(`${request.method} ${request.url} → ${status}`);
+    }
 
     const body: ApiError = {
       statusCode: status,
