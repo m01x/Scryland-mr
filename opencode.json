@@ -10,26 +10,28 @@
   "agent": {
     "backend": {
       "description": "Worker aislado del backend (app/api). Escribe solo dentro de app/api; shared/ y .spec/ son de solo lectura.",
-      "mode": "primary",
+      "mode": "all",
+      "prompt": "{file:app/api/AGENTS.md}",
       "permission": {
         "edit": {
-          "**": "deny",
-          ".spec/**": "deny",
-          "shared/**": "deny",
-          "app/api/**": "allow"
+          "*": "deny",
+          ".spec/*": "deny",
+          "shared/*": "deny",
+          "app/api/*": "allow"
         }
       }
     },
     "web": {
       "description": "Worker aislado del frontend (app/web). Escribe solo dentro de app/web; shared/, .spec/ y app/api/ son de solo lectura.",
-      "mode": "primary",
+      "mode": "all",
+      "prompt": "{file:app/web/AGENTS.md}",
       "permission": {
         "edit": {
-          "**": "deny",
-          ".spec/**": "deny",
-          "shared/**": "deny",
-          "app/api/**": "deny",
-          "app/web/**": "allow"
+          "*": "deny",
+          ".spec/*": "deny",
+          "shared/*": "deny",
+          "app/api/*": "deny",
+          "app/web/*": "allow"
         }
       }
     }
