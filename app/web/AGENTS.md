@@ -50,6 +50,24 @@ Si algo que lees en disco contradice este documento, gana el disco y se reporta 
 - Un print, una card: la UI representa prints específicos (nombre + set + variante), no nombres genéricos.
 - Los links a tienda son deep-links al producto real; Scryland no gestiona carrito.
 - Testing: queda para spec propia.
+
+## Arquitectura de features (frontend)
+
+- Cada pantalla/feature vive en `src/feature/<nombre>/` (singular,
+  kebab-case), con dos subcarpetas fijas:
+  - `components/` — UI propia de la feature (no compartida).
+  - `page/` — el componente de página que exporta `Route`
+    (`createFileRoute`).
+- `src/routes/` NUNCA contiene markup propio. Cada archivo de ruta solo
+  importa y re-exporta `Route` desde `@/feature/<nombre>/page`. Es una
+  capa de delegación pura hacia TanStack Router, no de implementación.
+- Lógica, hooks y estado específicos de una feature viven dentro de su
+  propia carpeta — no se filtran a `src/routes/` ni a otras features.
+- `src/components/ui/` es de shadcn y es compartido entre features. Si
+  una feature necesita modificarlo (nuevo variant, etc.), es responsa-
+  bilidad explícita del worker declarada en la spec — no un cambio
+  implícito.
+  
 ## Reporte
  
 Al terminar una tarea, reporta al orquestador para que registre el avance en `State.md`. El reporte incluye:
