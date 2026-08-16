@@ -13,7 +13,7 @@ Incluye:
 - Archivos raíz: `package.json`, `pnpm-workspace.yaml`, `.nvmrc`, `.env.example`, `.gitignore`.
 
 No incluye:
-- `app/web` (frontend), `packages/shared`, `e2e/`.
+- `app/web` (frontend), contrato de `shared/`, `e2e/`.
 - Integración con tiendas, specs de workers, agentes.
 
 ## Plan de implementación

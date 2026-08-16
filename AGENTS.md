@@ -14,21 +14,22 @@ Scryland es un portal comparador de precios de cartas de Magic: The Gathering en
 
 ## Stack
 
-- Monorepo único con **pnpm workspaces** (`app/*`, `packages/*`), un solo `.git` en la raíz.
+- Monorepo único con **pnpm workspaces** (`app/*`, `shared`), un solo `.git` en la raíz.
 - **Node**: LTS (v24), declarado en `engines` y en `.nvmrc`.
 - **pnpm**: versión fijada en `packageManager`, activada vía `corepack`.
 - **Backend**: NestJS en `app/api` (`@scryland/api`).
 - **Frontend** (futuro): React + TanStack en `app/web`.
-- **Contratos** (futuro): `packages/shared` (`@scryland/shared`) — tipos/DTOs puros, fuente de verdad del contrato entre frontend y backend.
+- **Contratos** (futuro): `shared/` (`@scryland/shared`) — tipos/DTOs puros, fuente de verdad del contrato entre frontend y backend.
 - **Scope de paquetes**: `@scryland/*`.
 
 ## Patrón de trabajo: orquestador-trabajador + Spec-Driven Design (SDD)
 
-- **Orquestador** — la sesión principal, en la raíz del repo. Define specs, mantiene `packages/shared` y `.spec/`, y reparte specs derivadas a los workers.
-- **Workers aislados** — `app/web` (React + TanStack) y `app/api` (NestJS). Cada uno con su propio `AGENTS.md` local; escriben únicamente dentro de su carpeta. `packages/shared` es de solo lectura: si necesitan cambiar el contrato, se detienen y lo reportan al orquestador.
-- **`packages/shared`** — interfaces puras (sin decoradores de Nest). Si un lado usa un campo que no existe ahí, no compila.
+- **Orquestador** — la sesión principal, en la raíz del repo. Define specs, mantiene `shared/` y `.spec/`, y reparte specs derivadas a los workers.
+- **Workers aislados** — `app/web` (React + TanStack) y `app/api` (NestJS). Cada uno con su propio `AGENTS.md` local; escriben únicamente dentro de su carpeta. `shared/` es de solo lectura: si necesitan cambiar el contrato, se detienen y lo reportan al orquestador.
+- **`shared/`** — interfaces puras (sin decoradores de Nest). Si un lado usa un campo que no existe ahí, no compila.
 - **`.spec/`** — carpeta única con `State.md` y cada spec numerada. Solo el orquestador escribe aquí.
-- **`e2e/`** — Playwright en la raíz, territorio del orquestador (cruza frontend y backend juntos).
+- **`.spec/Notion-format.md`** — Instrucciones de como actualizar notion para seguir un formato uniforme. Solo el orquestador escribe aquí.
+- **`.spec/Simple-Spec-format.md`** y **`.spec/Orchestrator-Spec-format.md`** — Formatos de spec (Simple y Orquestador). Solo el orquestador escribe aquí.
 
 **Regla dura:** frontend nunca toca código de backend y viceversa — solo lectura para observar, nunca escritura.
 
@@ -65,8 +66,8 @@ Cuatro estados, dos de ellos finales. Ninguna spec nueva se abre si la anterior 
 
 ## Estado actual
 
-- Monorepo pnpm montado (`app/*`), un solo `pnpm-lock.yaml`.
+- Monorepo pnpm montado (`app/*`, `shared`), un solo `pnpm-lock.yaml`.
 - `app/api` NestJS funcional (`@scryland/api`): `GET /` responde `200 "Hello World!"`.
-- `.spec/` con `Spec 00 - Scaffold del backend` (Implementado), `State.md` y `Contracts.md` (vacío).
-- Pendiente: `app/web`, `packages/shared`, `e2e/`.
+- `.spec/` con `Spec 00 - Scaffold del backend` (Implementado), `Spec 01 - Consolidación Shared y Convención de Specs` (Borrador) y `State.md`.
+- Pendiente: `app/web`, contrato de `shared/`, `e2e/`.
 - Testing: archivos de test eliminados por ahora; dependencias de testing instaladas para uso futuro.

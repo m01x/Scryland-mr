@@ -6,5 +6,19 @@
       "url": "https://mcp.notion.com/mcp",
       "oauth": {}
     }
+  },
+  "agent": {
+    "backend": {
+      "description": "Worker aislado del backend (app/api). Escribe solo dentro de app/api; shared/ y .spec/ son de solo lectura.",
+      "mode": "primary",
+      "permission": {
+        "edit": {
+          "**": "deny",
+          ".spec/**": "deny",
+          "shared/**": "deny",
+          "app/api/**": "allow"
+        }
+      }
+    }
   }
 }
