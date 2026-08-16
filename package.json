@@ -8,6 +8,12 @@
   },
   "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "dev:api": "pnpm --filter @scryland/api start:dev"
+    "dev:api": "pnpm --filter @scryland/api start:dev",
+    "dev:web": "pnpm --filter @scryland/web dev",
+    "dev": "concurrently -k -n api,web \"pnpm dev:api\" \"wait-on http://localhost:3000 && pnpm dev:web\""
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "wait-on": "^9.1.0"
   }
 }

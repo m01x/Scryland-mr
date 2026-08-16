@@ -1,6 +1,6 @@
 # Spec 02 - Scaffold del frontend
 
-**Estado:** Borrador
+**Estado:** Implementado
 **Fecha:** 2026-08-16
 **Tipo:** Simple
 
@@ -46,15 +46,15 @@ El monorepo tiene hoy solo `app/api` funcional. Sin `app/web` no existe el segun
 ## Criterios de aceptación
 El Orquestador ejecuta estas tareas directamente
 **aqui se definen tareas especificas**
-- [ ] `app/web` existe y su `package.json` declara `@scryland/web`.
-- [ ] `pnpm install` desde la raíz corre limpio con un solo `pnpm-lock.yaml`.
-- [ ] `pnpm dev:web` levanta el frontend y sirve la pantalla placeholder en el navegador.
-- [ ] `pnpm dev` levanta backend y frontend, en ese orden, sin que el frontend arranque antes de que el backend responda.
-- [ ] `app/web/AGENTS.md` declara `shared/`, `.spec/` y `app/api/` como solo lectura.
-- [ ] `opencode.json` restringe la escritura del agente frontend a `app/web/**`.
-- [ ] `.env.example` incluye el puerto de dev del frontend.
-- [ ] `app/api` no fue modificado por esta spec.
-- [ ] Humano revisa y da visto bueno final.
+- [x] `app/web` existe y su `package.json` declara `@scryland/web`.
+- [x] `pnpm install` desde la raíz corre limpio con un solo `pnpm-lock.yaml`.
+- [x] `pnpm dev:web` levanta el frontend y sirve la pantalla placeholder en el navegador.
+- [x] `pnpm dev` levanta backend y frontend, en ese orden, sin que el frontend arranque antes de que el backend responda.
+- [x] `app/web/AGENTS.md` declara `shared/`, `.spec/` y `app/api/` como solo lectura.
+- [x] `opencode.json` restringe la escritura del agente frontend a `app/web/**`.
+- [x] `.env.example` incluye el puerto de dev del frontend.
+- [x] `app/api` no fue modificado por esta spec. -nota, si modifico por un hotfix.
+- [x] Humano revisa y da visto bueno final.
 
 ## Decisiones
 
@@ -66,3 +66,13 @@ El Orquestador ejecuta estas tareas directamente
 ## Riesgos
 
 Bajo. El único punto con fricción real es el script `dev` con espera sobre el puerto, que introduce dos dependencias nuevas en la raíz (`concurrently`, `wait-on`). Si complica, se puede posponer y dejar solo `dev:api` y `dev:web` por separado, sin bloquear el resto de la spec.
+
+
+## Comentario adicional del humano
+
+Resultado del trabajo del agente.
+Cambios fuera de scope (reportados):
+1. Hotfix app/api/tsconfig.json:3: ignoreDeprecations: "6.0" → "5.0" (TS 5.9.3 solo acepta 5.0). Bug preexistente que impedía compilar el backend.
+2. Artefacto stale eliminado: app/api/tsconfig.build.tsbuildinfo (gitignored) — bloqueaba la emisión de dist/ por incremental.
+Nota: quedan untracked app/api/.agents/, app/api/.claude/, app/api/skills-lock.json (preexistentes, no los toqué). app/web/ está untracked (nuevo).
+State.md: Spec 02 → Aprobado | Listo para revisión = Sí.
