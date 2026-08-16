@@ -19,7 +19,7 @@ No asumas el entorno de memoria; léelo:
  
 - **`app/api/package.json`** — dependencias y scripts realmente disponibles. Si necesitas algo que no está listado, no lo instales: repórtalo al orquestador.
 - **`app/api/.agents/skills/`** — qué skills tienes hoy. Se pueblan a medida que crece el proyecto, así que la lista cambia entre sesiones.
-- **`app/api/.env.example`** y el de la raíz — variables y puertos vigentes.
+- **`.env.example` / `.env` de la raíz** — variables y puertos vigentes (fuente única).
 - **`shared/`** — el contrato actual, antes de escribir cualquier tipo propio.
 - **`.spec/State.md` y la spec vigente** — para entender el contexto de tu bloque de tarea.
 Si algo que lees en disco contradice este documento, gana el disco y se reporta la divergencia.
@@ -45,8 +45,7 @@ Si algo que lees en disco contradice este documento, gana el disco y se reporta 
 ## Convenciones
  
 - Nest y sus dependencias: lo que instaló la CLI en el scaffold, tal como aparece en `package.json`. No fijar versiones a mano.
-- Puerto por defecto: el declarado en `.env.example`.
-- Variables de entorno: se declaran en `.env.example`, nunca hardcodeadas.
+- Variables de entorno y puerto: viven exclusivamente en el `.env.example` / `.env` de la raíz del monorepo (territorio del orquestador). El worker reporta variables nuevas y no las escribe.
 - Testing: dependencias instaladas para uso futuro; los scripts de test ya están disponibles.
 ## Reporte
  

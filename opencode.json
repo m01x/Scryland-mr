@@ -17,7 +17,9 @@
           "*": "deny",
           ".spec/*": "deny",
           "shared/*": "deny",
-          "app/api/*": "allow"
+          "app/api/*": "allow",
+          "app/api/.agents/*": "deny",
+          "app/api/.claude/*": "deny"
         }
       }
     },
@@ -31,7 +33,9 @@
           ".spec/*": "deny",
           "shared/*": "deny",
           "app/api/*": "deny",
-          "app/web/*": "allow"
+          "app/web/*": "allow",
+          "app/web/.agents/*": "deny",
+          "app/web/.claude/*": "deny"
         }
       }
     }

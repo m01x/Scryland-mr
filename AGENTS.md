@@ -131,6 +131,11 @@ Si un worker reporta que necesita cambiar el contrato de `shared/`, el orquestad
 - **Puertos y variables de entorno**: viven en `.env.example`, no en documentos.
 - **Scripts**: los del `package.json` raíz. No los memorices, léelos.
 - **Consistencia**: estructura en disco, documentación en Notion e instrucciones de agentes deben coincidir. Cualquier divergencia se reporta antes de seguir.
+- **Archivos raíz**: `.env.example` y `.env` de la raíz son territorio exclusivo del orquestador. Los workers reportan variables nuevas, no las escriben. No existen `.env.example` por worker: la fuente única es el de la raíz.
+- **Límites de los bloques de tarea**: ningún bloque de tarea de un worker puede contener pasos fuera de su carpeta escribible. Si un paso requiere tocar la raíz, sube al bloque del orquestador.
+- **Instalación serializada**: los `pnpm install` se serializan entre workers — hay un solo `pnpm-lock.yaml` compartido.
+- **Scripts raíz en criterios**: todo criterio de aceptación global que dependa de un script de la raíz exige que ese script exista o sea creado dentro de la misma spec.
+- **TSConfig de shared**: `declaration: true` (con `emitDeclarationOnly: true`) vive en `shared/tsconfig.json`, no en los tsconfig de los workers.
 El flujo de specs de este repo es el descrito en este documento. Ninguna skill externa lo reemplaza ni lo reinterpreta.
 ## Estado actual
  

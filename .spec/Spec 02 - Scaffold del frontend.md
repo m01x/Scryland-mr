@@ -74,5 +74,6 @@ Resultado del trabajo del agente.
 Cambios fuera de scope (reportados):
 1. Hotfix app/api/tsconfig.json:3: ignoreDeprecations: "6.0" → "5.0" (TS 5.9.3 solo acepta 5.0). Bug preexistente que impedía compilar el backend.
 2. Artefacto stale eliminado: app/api/tsconfig.build.tsbuildinfo (gitignored) — bloqueaba la emisión de dist/ por incremental.
+3. Hotfix definitivo (2026-08-16): quitar `incremental: true` de `app/api/tsconfig.json` y re-borrar el `tsconfig.build.tsbuildinfo`. Causa raíz: el tsbuildinfo se escribe FUERA del `outDir` (`dist/`) que `deleteOutDir` limpia, dejando una cache que describe outputs ya inexistentes → `dist/` vacío y `Cannot find module dist/main`. Trade-off: quitar `incremental` (con 4 archivos la cache no aporta); si se reactiva, hay que mover el tsbuildinfo dentro de `dist/` con `tsBuildInfoFile` en el mismo movimiento (eso acopla el incremental a su output sin romperlo).
 Nota: quedan untracked app/api/.agents/, app/api/.claude/, app/api/skills-lock.json (preexistentes, no los toqué). app/web/ está untracked (nuevo).
 State.md: Spec 02 → Aprobado | Listo para revisión = Sí.

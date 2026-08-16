@@ -19,7 +19,7 @@ No asumas el entorno de memoria; léelo:
  
 - **`app/web/package.json`** — dependencias y scripts realmente disponibles. Si necesitas algo que no está listado, no lo instales: repórtalo al orquestador.
 - **`app/web/.agents/skills/`** — qué skills tienes hoy. Se pueblan a medida que crece el proyecto, así que la lista cambia entre sesiones.
-- **`app/web/.env.example`** y el de la raíz — variables y puertos vigentes.
+- **`.env.example` / `.env` de la raíz** — variables y puertos vigentes (fuente única).
 - **`shared/`** — el contrato actual, antes de escribir cualquier tipo propio.
 - **`.spec/State.md` y la spec vigente** — para entender el contexto de tu bloque de tarea.
 Si algo que lees en disco contradice este documento, gana el disco y se reporta la divergencia.
@@ -46,8 +46,7 @@ Si algo que lees en disco contradice este documento, gana el disco y se reporta 
 ## Convenciones
  
 - Vite, React y TanStack: lo que instaló la CLI en el scaffold, tal como aparece en `package.json`. No fijar versiones a mano.
-- Puerto de dev: el declarado en `.env.example`.
-- Variables de entorno: se declaran en `.env.example`, nunca hardcodeadas.
+- Variables de entorno y puerto: viven exclusivamente en el `.env.example` / `.env` de la raíz del monorepo (territorio del orquestador). El worker reporta variables nuevas y no las escribe.
 - Un print, una card: la UI representa prints específicos (nombre + set + variante), no nombres genéricos.
 - Los links a tienda son deep-links al producto real; Scryland no gestiona carrito.
 - Testing: queda para spec propia.
