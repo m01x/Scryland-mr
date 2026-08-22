@@ -1,14 +1,20 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/cinzel";
-@import "@fontsource-variable/inter";
+
+@font-face {
+    font-family: 'Basic';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./assets/fonts/Basic-Regular.ttf') format('truetype');
+}
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-display: var(--font-cinzel);
-    --font-sans: var(--font-inter);
+    --font-display: 'Basic', sans-serif;
+    --font-sans: 'Basic', sans-serif;
     --color-nebula-bg-base: var(--color-bg-base);
     --color-nebula-bg-recessed: var(--color-bg-recessed);
     --color-nebula-surface-1: var(--color-surface-1);
@@ -131,9 +137,9 @@
 
 @layer utilities {
     .font-display {
-        font-family: var(--font-display), 'Cinzel', serif;
+        font-family: var(--font-display), sans-serif;
     }
     .font-sans {
-        font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+        font-family: var(--font-sans), system-ui, sans-serif;
     }
 }

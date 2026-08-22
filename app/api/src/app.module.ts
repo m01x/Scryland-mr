@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { HttpModule } from '@nestjs/axios';
 import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { envValidationSchema } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { StoresModule } from './stores/stores.module';
 
 @Module({
   imports: [
@@ -20,7 +22,16 @@ import { HealthModule } from './health/health.module';
         allowUnknown: true,
       },
     }),
+    // Cliente HTTP compartido por los módulos de tiendas. `global: true`
+    // evita registrar una segunda instancia (sin el timeout) al importarlo
+    // dentro de `StoresModule`; así `StoreHttpService` inyecta el `HttpService`
+    // ya configurado. Todavía no hay llamadas reales a tiendas.
+    HttpModule.register({
+      timeout: 5000,
+      global: true,
+    }),
     HealthModule,
+    StoresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
