@@ -8,3 +8,4 @@
 | Spec 03 - Carpintería de frontend y base de API | Implementado | — | 2026-08-16 |
 | Spec 04 - Limpieza post-carpintería | Implementado | — | 2026-08-16 |
 | Spec 05 - UI de búsqueda de Scryland | Implementado | — | 2026-08-16 |
+| Spec 06 - Reestructuración shadcn, logo real y nav WatchTower | Implementado | — | 2026-08-18 |

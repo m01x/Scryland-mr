@@ -1,36 +1,47 @@
+import { Button } from '@/components/ui/button'
+
 /**
  * Nav del header de búsqueda.
  *
- * Presenta los dos botones principales del header ("Home" activo y
- * "Perfil"). En esta spec son display — no navegan ni abren handlers.
- * Las clases activas siguen las guías del mockup (sutil relleno sobre
- * el botón activo, ghost para los demás).
+ * Tres entradas display-only (`Home`, `WatchTower`, `Perfil`) construidas
+ * con `Button` de shadcn. No navegan ni abren handlers: esta spec no
+ * define rutas de destino, así que se renderizan deshabilitadas para que
+ * figuren como landmarks estructurales sin parecer clickeables.
  *
- * Para mantener accesibilidad sin entregar navegación real, cada botón
- * usa `<button type="button" disabled>` para que figure como landmark
- * estructural pero no se vea clickeable.
+ * "Home" es la entrada activa (`aria-current="page"`) y se resalta con la
+ * variante `secondary` + un halo violeta sutil; el resto usa `ghost`.
  */
 export default function Nav() {
   return (
     <nav
       aria-label="Principal"
-      className="flex items-center gap-2 rounded-full bg-[oklch(0.22_0.03_264/0.55)] p-1 backdrop-blur"
+      className="flex items-center gap-1 rounded-full border border-border bg-card/60 p-1 backdrop-blur"
     >
-      <button
+      <Button
         type="button"
+        variant="secondary"
         disabled
         aria-current="page"
-        className="cursor-default rounded-full bg-[oklch(0.27_0.034_264)] px-4 py-1.5 text-sm text-[oklch(0.97_0.006_260)] shadow-[0_0_14px_oklch(0.64_0.20_302/0.35)]"
+        className="rounded-full shadow-[0_0_14px_oklch(0.64_0.20_302/0.35)] disabled:opacity-100"
       >
         Home
-      </button>
-      <button
+      </Button>
+      <Button
         type="button"
+        variant="ghost"
         disabled
-        className="cursor-default rounded-full px-4 py-1.5 text-sm text-[oklch(0.72_0.02_262)] hover:text-[oklch(0.97_0.006_260)]"
+        className="rounded-full text-muted-foreground disabled:opacity-100"
+      >
+        WatchTower
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        disabled
+        className="rounded-full text-muted-foreground disabled:opacity-100"
       >
         Perfil
-      </button>
+      </Button>
     </nav>
   )
 }

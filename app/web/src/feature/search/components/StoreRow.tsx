@@ -1,5 +1,6 @@
 import type { StoreOffer } from '@scryland/shared'
 
+import { Badge } from '@/components/ui/badge'
 import { formatPrice } from '@/feature/search/components/priceFormat'
 
 interface StoreRowProps {
@@ -12,15 +13,13 @@ interface StoreRowProps {
  * Fila tienda + precio.
  *
  * Tres variantes visuales:
- * - `best`: dot verde mint (accent), precio destacado en negrita, label
- *   de la tienda en sólido. Es la fila "ganadora" de la card.
- * - `unavailable`: dot rojo (danger), label tenue, texto "Sin stock"
- *   en el slot del precio.
- * - regular: dot cian secundario, precio en color estándar.
+ * - `best`: dot verde mint (accent), precio destacado en un `Badge` verde.
+ * - `unavailable`: dot rojo (danger), label tenue, "Sin stock" en un
+ *   `Badge` tenue en el slot del precio.
+ * - regular: dot cian secundario, precio en un `Badge` neutro.
  *
- * El provider del link externo es la tienda real — Scryland no gestiona
- * carrito, solo deep-linkea. Esa parte vive en la card (`PrintCard`),
- * no aquí: la `StoreRow` es puramente presentacional.
+ * El precio/estado se representa con `Badge` de shadcn; el `StatusDot`
+ * queda custom (es un punto de color de 8px, no aporta como badge).
  */
 export default function StoreRow({ offer, isBest }: StoreRowProps) {
   if (!offer.available) {
@@ -28,15 +27,17 @@ export default function StoreRow({ offer, isBest }: StoreRowProps) {
       <div
         role="row"
         aria-label={`${storeLabel(offer.store)}: sin stock`}
-        className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-[oklch(0.72_0.02_262)]"
+        className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-muted-foreground"
       >
         <span className="flex items-center gap-2">
           <StatusDot tone="danger" />
-          <span className="font-medium uppercase tracking-wide text-[oklch(0.52_0.02_262)]">
+          <span className="font-medium uppercase tracking-wide text-muted-foreground/70">
             {storeLabel(offer.store)}
           </span>
         </span>
-        <span className="text-[oklch(0.52_0.02_262)]">Sin stock</span>
+        <Badge variant="outline" className="text-muted-foreground">
+          Sin stock
+        </Badge>
       </div>
     )
   }
@@ -50,13 +51,16 @@ export default function StoreRow({ offer, isBest }: StoreRowProps) {
       >
         <span className="flex items-center gap-2">
           <StatusDot tone="success" />
-          <span className="font-semibold uppercase tracking-wide text-[oklch(0.97_0.006_260)]">
+          <span className="font-semibold uppercase tracking-wide text-foreground">
             {storeLabel(offer.store)}
           </span>
         </span>
-        <span className="font-semibold text-[oklch(0.74_0.17_148)]">
+        <Badge
+          variant="outline"
+          className="border-[oklch(0.74_0.17_148/0.45)] bg-[oklch(0.74_0.17_148/0.15)] font-semibold text-[oklch(0.74_0.17_148)]"
+        >
           {formatPrice(offer.price, offer.currency)}
-        </span>
+        </Badge>
       </div>
     )
   }
@@ -65,7 +69,7 @@ export default function StoreRow({ offer, isBest }: StoreRowProps) {
     <div
       role="row"
       aria-label={`${storeLabel(offer.store)}: ${formatPrice(offer.price, offer.currency)}`}
-      className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-[oklch(0.72_0.02_262)]"
+      className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-muted-foreground"
     >
       <span className="flex items-center gap-2">
         <StatusDot tone="cyan" />
@@ -73,9 +77,9 @@ export default function StoreRow({ offer, isBest }: StoreRowProps) {
           {storeLabel(offer.store)}
         </span>
       </span>
-      <span className="font-medium text-[oklch(0.97_0.006_260)]">
+      <Badge variant="secondary" className="font-medium text-foreground">
         {formatPrice(offer.price, offer.currency)}
-      </span>
+      </Badge>
     </div>
   )
 }

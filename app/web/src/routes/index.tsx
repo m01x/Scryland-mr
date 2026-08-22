@@ -1,25 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { SearchRoot } from '@/feature/search/page'
+import { SearchPage } from '@/feature/search/page/SearchPage'
 
 /**
  * Ruta raíz (`/`): pantalla "Resultado de búsqueda".
  *
- * Esta capa es **delegación pura**. TanStack Router (file-based) exige
- * que el archivo declarado bajo `src/routes/` declare su `Route` con
- * `createFileRoute` — el motor del plugin no sigue re-exports
- * `export { X } from '...'` en su generador actual. Para conservar
- * markup fuera del router:
+ * Esta capa es **delegación pura**: el archivo solo expone `Route` con
+ * la firma de TanStack Router (`createFileRoute('/')({ component })`) y
+ * no declara JSX propio. Todo el markup vive en la feature `search/`,
+ * en `SearchPage` (`@/feature/search/page/SearchPage`), que es
+ * autocontenido (inyecta sus propios datos sin props ni wrappers).
  *
- *   1. Este archivo solo expone `Route` con la firma TanStack.
- *   2. El componente (`SearchRoot`) y todo el markup de la página
- *      viven en la feature `search/`.
- *   3. La convención "el router nunca contiene markup propio" se
- *      preserva: este archivo no declara JSX directamente, solo
- *      referencia el componente delegado.
- *
- * Ver `app/web/AGENTS.md` ("Arquitectura de features") y la spec 05.
+ * Ver `app/web/AGENTS.md` ("Arquitectura de features").
  */
 export const Route = createFileRoute('/')({
-  component: SearchRoot,
+  component: SearchPage,
 })
