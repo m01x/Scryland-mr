@@ -10,3 +10,4 @@
 | Spec 05 - UI de búsqueda de Scryland | Implementado | — | 2026-08-16 |
 | Spec 06 - Reestructuración shadcn, logo real y nav WatchTower | Implementado | — | 2026-08-18 |
 | Spec 07 - Fuente local "Basic", infra de consulta y Playwright E2E | Implementado | — | 2026-08-22 |
+| Spec 08 - Limpieza de lint del backend | Aprobado | Sí | 2026-08-22 |
