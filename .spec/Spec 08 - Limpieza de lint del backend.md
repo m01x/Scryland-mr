@@ -1,6 +1,6 @@
 # Spec 08 - Limpieza de lint del backend (EOL, no-floating-promises y glob)
 
-**Estado:** Aprobado
+**Estado:** Implementado
 **Fecha:** 2026-08-22
 **Tipo:** Orquestador
 
