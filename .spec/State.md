@@ -11,7 +11,7 @@
 | Spec 06 - Reestructuración shadcn, logo real y nav WatchTower | Implementado | — | 2026-08-18 |
 | Spec 07 - Fuente local "Basic", infra de consulta y Playwright E2E | Implementado | — | 2026-08-22 |
 | Spec 08 - Limpieza de lint del backend | Implementado | — | 2026-08-22 |
-| Spec 09 - Búsqueda real contra tiendas | Aprobado | Sí | 2026-08-22 |
+| Spec 09 - Búsqueda real contra tiendas | Implementado | — | 2026-08-22 |
 
 ## Deuda diferida
 

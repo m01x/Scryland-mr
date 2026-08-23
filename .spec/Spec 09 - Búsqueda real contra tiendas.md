@@ -53,7 +53,7 @@ Verificación en vivo (hecha por el orquestador antes de redactar): `inekosingle
 - [x] La búsqueda cachea por query normalizada (una segunda llamada idéntica no re-consulta las tiendas).
 - [x] `bestPrice` es el mínimo de las ofertas disponibles; si no hay ninguna disponible es `null` (nunca `0` ni `Infinity`).
 - [x] `pnpm --filter @scryland/api build` y `pnpm --filter @scryland/api lint` pasan (exit 0).
-- [ ] Humano revisa y da visto bueno.
+- [x] Humano revisa y da visto bueno.
 
 ## Decisiones
 - **`/search/suggest.json` como única fuente por query:** un solo request por tienda da `title`, `price`, `available`, `handle` e `image` juntos. Evita N+1 contra `/products/{handle}.js`. El costo: foil/normal se fusiona y solo se ve el precio mínimo (asumido en v1).
@@ -84,7 +84,7 @@ Verificación en vivo (hecha por el orquestador antes de redactar): `inekosingle
 
 # Tarea — @Agente-Backend
 
-**Estado:** Aprobado
+**Estado:** Implementado
 
 ### Contexto
 Tenés la infra de consulta de Spec 07 (`StoreHttpService` para el GET genérico, `CacheService` TTL, `StoresModule` con constantes de Ineko/Paytowin, `HttpModule` con timeout 5s). El contrato `SearchResult`/`StoreOffer`/`SearchResponse` vive en `@scryland/shared` y el orquestador ya agregó `url?: string` a `StoreOffer`. Tu trabajo es la primera integración real contra las tiendas.
