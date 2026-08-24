@@ -1,4 +1,4 @@
-import type { StoreOffer } from '@scryland/shared'
+import type { StoreId, StoreOffer } from '@scryland/shared'
 
 import { Badge } from '@/components/ui/badge'
 import { formatPrice } from '@/feature/search/components/priceFormat'
@@ -9,30 +9,40 @@ interface StoreRowProps {
   isBest: boolean
 }
 
+/** Etiqueta de tienda por id canónico (`StoreId`). */
+const STORE_LABELS: Record<StoreId, string> = {
+  ineko: 'INEKO',
+  paytowin: 'Paytowin',
+  catlotus: 'Catlotus',
+}
+
 /**
  * Fila tienda + precio.
  *
  * Tres variantes visuales:
- * - `best`: dot verde mint (accent), precio destacado en un `Badge` verde.
+ * - `best`: dot verde mint (accent), precio destacado en un `Badge` verde,
+ *   rotulado "desde $X" (el `price` es el mínimo entre variantes).
  * - `unavailable`: dot rojo (danger), label tenue, "Sin stock" en un
- *   `Badge` tenue en el slot del precio.
+ *   `Badge` tenue en el slot del precio (sin link).
  * - regular: dot cian secundario, precio en un `Badge` neutro.
  *
- * El precio/estado se representa con `Badge` de shadcn; el `StatusDot`
- * queda custom (es un punto de color de 8px, no aporta como badge).
+ * Las filas disponibles enlazan al deep-link real (`offer.url`) en una
+ * pestaña nueva (`target="_blank"`, `rel="noopener noreferrer"`).
  */
 export default function StoreRow({ offer, isBest }: StoreRowProps) {
+  const label = STORE_LABELS[offer.store]
+
   if (!offer.available) {
     return (
       <div
         role="row"
-        aria-label={`${storeLabel(offer.store)}: sin stock`}
+        aria-label={`${label}: sin stock`}
         className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-muted-foreground"
       >
         <span className="flex items-center gap-2">
           <StatusDot tone="danger" />
           <span className="font-medium uppercase tracking-wide text-muted-foreground/70">
-            {storeLabel(offer.store)}
+            {label}
           </span>
         </span>
         <Badge variant="outline" className="text-muted-foreground">
@@ -44,43 +54,47 @@ export default function StoreRow({ offer, isBest }: StoreRowProps) {
 
   if (isBest) {
     return (
-      <div
+      <a
+        href={offer.url}
+        target="_blank"
+        rel="noopener noreferrer"
         role="row"
-        aria-label={`${storeLabel(offer.store)}: mejor precio ${formatPrice(offer.price, offer.currency)}`}
-        className="flex items-center justify-between rounded-md bg-[oklch(0.74_0.17_148/0.10)] px-3 py-2 text-sm ring-1 ring-[oklch(0.74_0.17_148/0.45)]"
+        aria-label={`${label}: mejor precio desde ${formatPrice(offer.price, offer.currency)}`}
+        className="flex items-center justify-between rounded-md bg-[oklch(0.74_0.17_148/0.10)] px-3 py-2 text-sm ring-1 ring-[oklch(0.74_0.17_148/0.45)] transition-colors hover:bg-[oklch(0.74_0.17_148/0.16)]"
       >
         <span className="flex items-center gap-2">
           <StatusDot tone="success" />
           <span className="font-semibold uppercase tracking-wide text-foreground">
-            {storeLabel(offer.store)}
+            {label}
           </span>
         </span>
         <Badge
           variant="outline"
           className="border-[oklch(0.74_0.17_148/0.45)] bg-[oklch(0.74_0.17_148/0.15)] font-semibold text-[oklch(0.74_0.17_148)]"
         >
-          {formatPrice(offer.price, offer.currency)}
+          desde {formatPrice(offer.price, offer.currency)}
         </Badge>
-      </div>
+      </a>
     )
   }
 
   return (
-    <div
+    <a
+      href={offer.url}
+      target="_blank"
+      rel="noopener noreferrer"
       role="row"
-      aria-label={`${storeLabel(offer.store)}: ${formatPrice(offer.price, offer.currency)}`}
-      className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-muted-foreground"
+      aria-label={`${label}: ${formatPrice(offer.price, offer.currency)}`}
+      className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
     >
       <span className="flex items-center gap-2">
         <StatusDot tone="cyan" />
-        <span className="font-medium uppercase tracking-wide">
-          {storeLabel(offer.store)}
-        </span>
+        <span className="font-medium uppercase tracking-wide">{label}</span>
       </span>
       <Badge variant="secondary" className="font-medium text-foreground">
         {formatPrice(offer.price, offer.currency)}
       </Badge>
-    </div>
+    </a>
   )
 }
 
@@ -98,12 +112,4 @@ function StatusDot({ tone }: { tone: 'success' | 'cyan' | 'danger' }) {
       className={`size-2 rounded-full ${toneClass}`}
     />
   )
-}
-
-/** Etiqueta de la tienda. El store id llega en lowercase desde mocks; mostramos mayúsculas. */
-function storeLabel(id: string): string {
-  if (id.toLowerCase() === 'p2w') return 'P2W'
-  if (id.toLowerCase() === 'ineko') return 'INEKO'
-  if (id.toLowerCase() === 'catlotus') return 'Catlotus'
-  return id
 }

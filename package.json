@@ -13,8 +13,8 @@
     "dev": "concurrently -k -n api,web \"pnpm dev:api\" \"wait-on http://localhost:3000/api/health && pnpm dev:web\"",
     "build:shared": "pnpm --filter @scryland/shared build",
     "build": "pnpm build:shared && pnpm --filter @scryland/api build && pnpm --filter @scryland/web build",
-    "e2e": "playwright test --config e2e/playwright.config.ts",
-    "e2e:ui": "playwright test --config e2e/playwright.config.ts --ui"
+    "e2e": "pnpm build:shared && playwright test --config e2e/playwright.config.ts",
+    "e2e:ui": "pnpm build:shared && playwright test --config e2e/playwright.config.ts --ui"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",

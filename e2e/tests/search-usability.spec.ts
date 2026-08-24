@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
-test.describe('Usabilidad — pantalla de búsqueda', () => {
-  test('renderiza la pantalla completa con la fuente Basic y el glow del logo', async ({
+test.describe('Usabilidad — pantalla de búsqueda (datos reales)', () => {
+  test('renderiza la pantalla base con fuente Basic y estado idle', async ({
     page,
   }) => {
     await page.goto('/')
@@ -19,17 +19,9 @@ test.describe('Usabilidad — pantalla de búsqueda', () => {
     await expect(nav.getByRole('button', { name: 'WatchTower' })).toBeVisible()
     await expect(nav.getByRole('button', { name: 'Perfil' })).toBeVisible()
 
-    // Caja de búsqueda con el query
-    await expect(page.getByTestId('search-query')).toHaveText('Sol Ring')
-    await expect(page.getByText('Resultado de búsqueda', { exact: true })).toBeVisible()
-
-    // Filtros y contador (4 ediciones)
-    await expect(page.getByText('Disponibilidad:')).toBeVisible()
-    await expect(page.getByText('Ordenar por:')).toBeVisible()
-    await expect(page.getByTestId('editions-count')).toHaveText('4')
-
-    // Grilla con 4 cards de print
-    await expect(page.getByTestId('print-card')).toHaveCount(4)
+    // Input de búsqueda (query vacía) → estado idle observable
+    await expect(page.getByTestId('search-input')).toBeVisible()
+    await expect(page.getByTestId('search-idle')).toBeVisible()
 
     // Fuente local "Basic" declarada en body (reemplaza Cinzel/Inter)
     const bodyFont = await page.evaluate(
@@ -50,5 +42,52 @@ test.describe('Usabilidad — pantalla de búsqueda', () => {
       (el) => getComputedStyle(el).animationName,
     )
     expect(animationOnHover).toContain('logo-breathe')
+  })
+
+  test('buscar "Sol Ring Fallout" muestra 4 cards separadas con deep-links', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByTestId('search-input').fill('Sol Ring Fallout')
+
+    // Cuatro prints distintos (un print = una card), no fusionados
+    await expect(page.getByTestId('print-card')).toHaveCount(4, {
+      timeout: 30_000,
+    })
+    await expect(page.getByTestId('editions-count')).toHaveText('4')
+
+    // Deep-links reales a /products/... en la card
+    const firstCardLinks = page
+      .getByTestId('print-card')
+      .first()
+      .locator('a[href*="/products/"]')
+    await expect(firstCardLinks.first()).toBeVisible()
+  })
+
+  test('buscar "Purphoros" muestra ofertas de INEKO y Paytowin con "desde"', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.getByTestId('search-input').fill('Purphoros')
+
+    await expect(page.getByTestId('print-card').first()).toBeVisible({
+      timeout: 30_000,
+    })
+
+    // Ofertas reales de las dos tiendas objetivo
+    await expect(page.getByText('INEKO').first()).toBeVisible()
+    await expect(page.getByText('Paytowin').first()).toBeVisible()
+
+    // Precio rotulado "desde $X" (el price es el mínimo entre variantes)
+    await expect(page.getByText('desde', { exact: false }).first()).toBeVisible()
+  })
+
+  test('búsqueda sin resultados muestra estado vacío', async ({ page }) => {
+    await page.goto('/')
+    await page.getByTestId('search-input').fill('zzzzqqqqwwww')
+
+    await expect(page.getByTestId('search-empty')).toBeVisible({
+      timeout: 30_000,
+    })
   })
 })

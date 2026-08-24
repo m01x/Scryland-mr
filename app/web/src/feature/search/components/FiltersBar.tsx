@@ -3,19 +3,30 @@ import { ChevronDown } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 
+export type AvailabilityFilter = 'all' | 'available'
+
 interface FiltersBarProps {
   totalEditions: number
+  availability: AvailabilityFilter
+  onAvailabilityChange: (value: AvailabilityFilter) => void
 }
 
 /**
  * FiltersBar — línea de filtros y contador.
  *
- * Recreada sobre shadcn: cada filtro visual es un `Button` `outline` con
- * su valor actual en un `Badge` y el `ChevronDown` de `lucide-react` en
- * lugar del "▾" a mano. Siguen siendo display-only: no mutan estado ni
- * disparan handlers (la búsqueda funcional es una spec futura).
+ * El filtro "Disponibilidad" ahora opera sobre datos reales: alterna entre
+ * "Todas" y "Solo disponibles" (`aria-pressed` sobre el botón) y la página
+ * filtra los `results` por `offers.some(o => o.available)`. "Ordenar por"
+ * sigue display-only y el contador sigue mostrando el total de ediciones
+ * encontradas (sin cambios de alcance).
  */
-export default function FiltersBar({ totalEditions }: FiltersBarProps) {
+export default function FiltersBar({
+  totalEditions,
+  availability,
+  onAvailabilityChange,
+}: FiltersBarProps) {
+  const onlyAvailable = availability === 'available'
+
   return (
     <div className="flex flex-col items-start justify-between gap-3 rounded-2xl border border-border bg-card/60 px-5 py-3 sm:flex-row sm:items-center sm:gap-6">
       <div
@@ -23,7 +34,22 @@ export default function FiltersBar({ totalEditions }: FiltersBarProps) {
         aria-label="Filtros de búsqueda"
         className="flex flex-wrap items-center gap-2"
       >
-        <FilterButton label="Disponibilidad:" value="Todas" />
+        <Button
+          type="button"
+          variant="outline"
+          aria-pressed={onlyAvailable}
+          onClick={() =>
+            onAvailabilityChange(onlyAvailable ? 'all' : 'available')
+          }
+          className="gap-2 rounded-full"
+        >
+          <span className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+            Disponibilidad:
+          </span>
+          <Badge variant="secondary">
+            {onlyAvailable ? 'Solo disponibles' : 'Todas'}
+          </Badge>
+        </Button>
         <FilterButton label="Ordenar por:" value="Precio más bajo" />
       </div>
 

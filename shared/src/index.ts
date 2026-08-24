@@ -12,14 +12,16 @@ export interface ApiError {
   timestamp?: string;
 }
 
+export type StoreId = 'ineko' | 'paytowin' | 'catlotus'
+
 export interface StoreOffer {
-  /** Id canónico de tienda: 'ineko' | 'paytowin' | 'catlotus'. */
-  store: string;
+  /** Id canónico de tienda. */
+  store: StoreId;
   price: number | null;
   currency: string;
   available: boolean;
-  /** Deep-link al producto en la tienda. Opcional en Spec 09; requerido desde Spec 10. */
-  url?: string;
+  /** Deep-link al producto en la tienda. Requerido desde Spec 10. */
+  url: string;
 }
 
 export interface SearchResult {

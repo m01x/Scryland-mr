@@ -1,10 +1,9 @@
 /**
  * Formateador de precios.
  *
- * Recibe `price: number | null` y `currency: string`. Currency hoy es
- * siempre "CLP" en los mocks; si el contrato usa otra sigla, la
- * formateamos en consecuencia. La salida es human-readable alineada
- * con el mockup ("$12.000" — separador de miles con punto).
+ * Recibe `price: number | null` y `currency: string`. Si el contrato usa
+ * una sigla distinta de "CLP", la formateamos en consecuencia. La salida es
+ * human-readable ("$12.000" — separador de miles con punto).
  *
  * Devuelve un em-dash cuando el precio es `null` (caso sin stock), pero
  * la UI raramente llamará con `null` aquí — la columna precio tiene

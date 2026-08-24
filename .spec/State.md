@@ -12,14 +12,12 @@
 | Spec 07 - Fuente local "Basic", infra de consulta y Playwright E2E | Implementado | — | 2026-08-22 |
 | Spec 08 - Limpieza de lint del backend | Implementado | — | 2026-08-22 |
 | Spec 09 - Búsqueda real contra tiendas | Implementado | — | 2026-08-22 |
+| Spec 10 - Conexión del frontend con la búsqueda real | Implementado | — | 2026-08-23 |
 
 ## Deuda diferida
 
 | Deuda | Spec objetivo |
 |-------|---------------|
-| `StoreOffer.url?: string` → `url: string` (requerido) | Spec 10 |
-| `StoreOffer.store: string` → `StoreId` union (`ineko`/`paytowin`/`catlotus`) | Spec 10 |
-| `SearchResult.bestPrice: number | null` → `bestPrice?: number` (ausente) | Spec 10 |
-| UI rotula "desde $X" (price es el mínimo de variantes) | Spec 10 |
-| Detalle de variantes vía `/products/<handle>.js` | futura |
+| Precio real por variante: `price` de `suggest.json` es `price_min` (condición más barata, ej. Damaged, o idioma/foil) ⇒ "desde $X" engañoso; leer condición/idioma/foil por variante vía `/products/<handle>.js` (ineko) / `.json` (paytowin) | Spec 11 |
 | Traducción ES→EN vía Scryfall | futura |
+| Límite de ~10 productos por query de `suggest.json` | futura |

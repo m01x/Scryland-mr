@@ -27,19 +27,19 @@ interface PrintCardProps {
  * Cuando no hay stock en ninguna tienda, la card usa su variante
  * `unavailable`: el arte cambia a un placeholder tachado, los `StoreRow`
  * muestran "Sin stock", el CTA queda deshabilitado y la card gana un glow
- * rojo inferior sutil. Cuando la mejor oferta es de P2W, el CTA usa la
+ * rojo inferior sutil. Cuando la mejor oferta es de Paytowin, el CTA usa la
  * variante `accent` (verde mint) alineada con la fila ganadora.
  */
 export default function PrintCard({ result }: PrintCardProps) {
   const isUnavailable = result.offers.every((o) => !o.available)
   const bestPrice = result.bestPrice ?? null
-  const bestStoreName = bestStoreOf(result.offers, bestPrice)
+  const bestOffer = winningOffer(result.offers, bestPrice)
 
   return (
     <Card
       data-testid="print-card"
       data-available={isUnavailable ? 'false' : 'true'}
-      data-best={bestStoreName ?? ''}
+      data-best={bestOffer?.store ?? ''}
       className={
         isUnavailable
           ? 'rounded-2xl pt-0 shadow-[0_8px_30px_oklch(0.13_0.024_262/0.55),inset_0_-60px_60px_-30px_oklch(0.60_0.19_25/0.35)]'
@@ -77,12 +77,7 @@ export default function PrintCard({ result }: PrintCardProps) {
       </CardContent>
 
       <CardFooter className="mt-auto">
-        <BestPriceCta
-          price={bestPrice}
-          currency={result.offers[0]?.currency ?? 'CLP'}
-          bestStore={bestStoreName}
-          unavailable={isUnavailable}
-        />
+        <BestPriceCta bestOffer={bestOffer} unavailable={isUnavailable} />
       </CardFooter>
     </Card>
   )
@@ -117,17 +112,13 @@ function CardArtPlaceholder({ unavailable }: { unavailable: boolean }) {
 }
 
 function BestPriceCta({
-  price,
-  currency,
-  bestStore,
+  bestOffer,
   unavailable,
 }: {
-  price: number | null
-  currency: string
-  bestStore: string | null
+  bestOffer: StoreOffer | null
   unavailable: boolean
 }) {
-  if (unavailable) {
+  if (unavailable || bestOffer === null) {
     return (
       <Button
         type="button"
@@ -141,33 +132,35 @@ function BestPriceCta({
   }
 
   /**
-   * La card 2 (Revised Edition con P2W como best) usa variant="accent" —
+   * Cuando la mejor oferta es de Paytowin, el CTA usa `variant="accent"` —
    * la fila marcada como "best-price" en verde mint se alinea con el CTA.
-   * Esta es la regla explícita de la spec.
+   * Esta es la regla explícita de la spec (id canónico `paytowin`).
    */
-  const isAccentVariant = bestStore?.toLowerCase() === 'p2w'
+  const isAccentVariant = bestOffer.store === 'paytowin'
+
+  const priceLabel =
+    bestOffer.price !== null
+      ? `Ver mejor precio · desde ${formatPrice(bestOffer.price, bestOffer.currency)} →`
+      : 'Ver mejor precio →'
 
   return (
     <Button
-      type="button"
+      asChild
       variant={isAccentVariant ? 'accent' : 'default'}
       className="w-full"
     >
-      {price !== null
-        ? `Ver mejor precio · ${formatPrice(price, currency)} →`
-        : 'Ver mejor precio →'}
+      <a href={bestOffer.url} target="_blank" rel="noopener noreferrer">
+        {priceLabel}
+      </a>
     </Button>
   )
 }
 
-/** Devuelve el `store` de la oferta con el mejor precio, o null. */
-function bestStoreOf(
+/** Devuelve la oferta ganadora (disponible y con el mejor precio) o null. */
+function winningOffer(
   offers: StoreOffer[],
   bestPrice: number | null,
-): string | null {
+): StoreOffer | null {
   if (bestPrice === null) return null
-  const winner = offers.find(
-    (o) => o.available && o.price === bestPrice,
-  )
-  return winner?.store ?? null
+  return offers.find((o) => o.available && o.price === bestPrice) ?? null
 }

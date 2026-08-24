@@ -1,4 +1,4 @@
-import type { StoreOffer } from '@scryland/shared';
+import type { StoreId, StoreOffer } from '@scryland/shared';
 import { SUGGEST_ENDPOINT_PATH } from '../../stores/stores.constants';
 import { StoreHttpService } from '../../stores/store-http.service';
 import { normalizePrint, parsePrice } from '../normalize';
@@ -19,7 +19,7 @@ export abstract class ShopifySuggestAdapter implements StoreAdapter {
   protected constructor(
     protected readonly http: StoreHttpService,
     protected readonly baseUrl: string,
-    protected readonly storeId: string,
+    protected readonly storeId: StoreId,
   ) {}
 
   async search(query: string): Promise<NormalizedOffer[]> {
