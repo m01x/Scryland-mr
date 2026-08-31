@@ -5,7 +5,7 @@
     "react/rules-of-hooks": "error",
     "react/only-export-components": [
       "warn",
-      { "allowExportNames": ["buttonVariants", "badgeVariants"] }
+      { "allowExportNames": ["buttonVariants", "badgeVariants", "STORE_LABELS", "STORE_IDS"] }
     ]
   },
   "overrides": [

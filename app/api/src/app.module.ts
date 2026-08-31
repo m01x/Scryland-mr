@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { envValidationSchema } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { OffersModule } from './offers/offers.module';
 import { SearchModule } from './search/search.module';
 import { StoresModule } from './stores/stores.module';
 
@@ -34,6 +35,7 @@ import { StoresModule } from './stores/stores.module';
     HealthModule,
     StoresModule,
     SearchModule,
+    OffersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

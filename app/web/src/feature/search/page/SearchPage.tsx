@@ -17,26 +17,33 @@ import {
 } from '@/feature/search/components/ResultsStates'
 import SearchBox from '@/feature/search/components/SearchBox'
 import { fetchSearch } from '@/feature/search/data/search'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 
 /** El backend cachea por query (TTL 5 min): no refetchear encima. */
 const SEARCH_STALE_TIME_MS = 5 * 60 * 1000
 /** Coherente con el `@MinLength(2)` del DTO del backend. */
 const MIN_QUERY_LENGTH = 2
+/** Debounce del input: un tecleo real dispara una sola búsqueda (Spec 11). */
+const SEARCH_DEBOUNCE_MS = 300
 
 /**
  * Página "Resultado de búsqueda" de Scryland.
  *
  * Composición vertical: hero nebuloso, logo + nav, caja de búsqueda
  * (input controlado), filtros y grilla de ediciones. La búsqueda consume
- * `GET /api/search` vía `useQuery` (key `['search', query]`), con `enabled`
- * solo a partir de 2 caracteres y `staleTime` alto. Los estados
+ * `GET /api/search` vía `useQuery` (key `['search', query]`) sobre el valor
+ * **debounceado** (~300ms): el input sigue atado al estado inmediato, pero
+ * `enabled`/estados dependen del debounce, con `staleTime` alto. Los estados
  * `loading`/`error`/vacío reemplazan al maqueteo anterior.
  */
 export function SearchPage() {
   const [query, setQuery] = useState('')
   const [availability, setAvailability] = useState<AvailabilityFilter>('all')
 
-  const trimmedQuery = query.trim()
+  // El input queda atado a `query` (estado inmediato); la búsqueda consume
+  // el valor debounceado, así `enabled`/estados siguen al debounce.
+  const debouncedQuery = useDebouncedValue(query, SEARCH_DEBOUNCE_MS)
+  const trimmedQuery = debouncedQuery.trim()
   const hasQuery = trimmedQuery.length >= MIN_QUERY_LENGTH
 
   const searchQuery = useQuery({

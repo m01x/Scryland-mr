@@ -13,11 +13,11 @@
 | Spec 08 - Limpieza de lint del backend | Implementado | — | 2026-08-22 |
 | Spec 09 - Búsqueda real contra tiendas | Implementado | — | 2026-08-22 |
 | Spec 10 - Conexión del frontend con la búsqueda real | Implementado | — | 2026-08-23 |
+| Spec 11 - Precio real por variante y modal de detalle | Implementado | — | 2026-08-31 |
 
 ## Deuda diferida
 
 | Deuda | Spec objetivo |
 |-------|---------------|
-| Precio real por variante: `price` de `suggest.json` es `price_min` (condición más barata, ej. Damaged, o idioma/foil) ⇒ "desde $X" engañoso; leer condición/idioma/foil por variante vía `/products/<handle>.js` (ineko) / `.json` (paytowin) | Spec 11 |
 | Traducción ES→EN vía Scryfall | futura |
 | Límite de ~10 productos por query de `suggest.json` | futura |

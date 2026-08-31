@@ -51,6 +51,9 @@ export abstract class ShopifySuggestAdapter implements StoreAdapter {
       available: product.available,
       // Deep-link limpio, sin la query de tracking (`?_pos=...`).
       url: `${this.baseUrl}/products/${product.handle}`,
+      // Identificador para pedir el detalle de variantes (no derivar del `url`).
+      handle: product.handle,
+      imageUrl: product.featured_image?.url,
     };
 
     return {
